@@ -1,0 +1,110 @@
+spring:
+  application:
+    name: code-reviewer
+
+  # R2DBC 响应式数据库配置
+  r2dbc:
+    url: r2dbc:mysql://localhost:3306/code_reviewer?useSSL=false&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: ${DB_PASSWORD:root}
+    pool:
+      initial-size: 10
+      max-size: 50
+      max-idle-time: 30m
+
+  # Redis 响应式配置
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: 0
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+
+  # RabbitMQ 配置
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+    virtual-host: /
+    listener:
+      simple:
+        acknowledge-mode: manual
+        prefetch: 1
+        retry:
+          enabled: true
+          max-attempts: 3
+
+# JWT 配置
+jwt:
+  secret: ${JWT_SECRET:Y29kZS1yZXZpZXdlci1zZWNyZXQta2V5LWZvci1qd3QtdG9rZW4tZ2VuZXJhdGlvbi0yMDI2LXZlcnktbG9uZy1zZWNyZXQta2V5LWF0LWxlYXN0LTI1Ni1iaXRz}
+  expiration: 86400000 # 24小时（毫秒）
+  refresh-expiration: 604800000 # 7天（毫秒）
+
+# WebSocket 配置
+websocket:
+  endpoint: /ws
+  allowed-origins:
+    - http://localhost:8080
+    - http://localhost:3000
+  stomp:
+    broker:
+      prefix: /topic
+    application:
+      prefix: /app
+
+# AI 分析配置
+ai:
+  enabled: ${AI_ENABLED:true}
+  provider: ${AI_PROVIDER:openai}
+  openai:
+    api-key: ${OPENAI_API_KEY:}
+    model: ${OPENAI_MODEL:gpt-4}
+    base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}
+  max-code-lines: 500
+  timeout: 60000
+
+# Actuator 配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+  health:
+    redis:
+      enabled: true
+    rabbit:
+      enabled: true
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    io.r2dbc.mysql: DEBUG
+    org.springframework.data.r2dbc: DEBUG
+    org.springframework.security: DEBUG
+    com.jianxiang.codereviewer: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/code-reviewer.log
+    max-size: 10MB
+    max-history: 30
+
+# 服务器配置
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
