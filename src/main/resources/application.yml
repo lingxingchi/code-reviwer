@@ -47,17 +47,12 @@ jwt:
   expiration: 86400000 # 24小时（毫秒）
   refresh-expiration: 604800000 # 7天（毫秒）
 
-# WebSocket 配置
+# WebSocket 配置 (WebFlux 原生)
 websocket:
-  endpoint: /ws
+  endpoint: /ws/room
   allowed-origins:
     - http://localhost:8080
     - http://localhost:3000
-  stomp:
-    broker:
-      prefix: /topic
-    application:
-      prefix: /app
 
 # AI 分析配置
 ai:
